@@ -1,13 +1,15 @@
-
-
 import azure.functions as func
 import datetime
 import json
 import logging
 import uuid
 import os
+import time
 from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
+from msrest.authentication import CognitiveServicesCredentials
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes, VisualFeatureTypes
 from PIL import Image
 import io
 
@@ -24,6 +26,19 @@ def get_blob_service_client():
         account_url = "https://stimagerecprod001.blob.core.windows.net"
         credential = DefaultAzureCredential()
         return BlobServiceClient(account_url=account_url, credential=credential)
+
+# Initialize Computer Vision client
+def get_computer_vision_client():
+    """Initialize Azure Computer Vision client"""
+    endpoint = os.environ.get("COMPUTER_VISION_ENDPOINT")
+    key = os.environ.get("COMPUTER_VISION_KEY")
+    
+    if not endpoint or not key:
+        raise Exception("COMPUTER_VISION_ENDPOINT and COMPUTER_VISION_KEY environment variables required")
+    
+    credentials = CognitiveServicesCredentials(key)
+    return ComputerVisionClient(endpoint, credentials)
+
 
 @app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS)
 def health(req: func.HttpRequest) -> func.HttpResponse:
@@ -247,6 +262,239 @@ def upload_image(req: func.HttpRequest) -> func.HttpResponse:
             json.dumps({
                 "success": False,
                 "error": f"Server error: {str(e)}",
+                "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+            }),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+@app.route(route="images/{imageId}/analyze", auth_level=func.AuthLevel.ANONYMOUS, methods=["POST"])
+def analyze_image(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Analyze image endpoint
+    Takes an imageId and analyzes the corresponding blob
+    Returns comprehensive analysis results
+    """
+    logging.info('Image analysis endpoint called')
+    
+    try:
+        # Get imageId from route
+        image_id = req.route_params.get('imageId')
+        if not image_id:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "error": "Image ID is required in URL path",
+                    "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+                }),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Find the blob with this imageId        
+        blob_service_client = get_blob_service_client()
+        container_client = blob_service_client.get_container_client("images-upload")
+        
+        # Debug: Log all blobs and their metadata
+        logging.info(f"Looking for image_id: {image_id}")
+        blob_count = 0
+        target_blob = None
+        
+        for blob in container_client.list_blobs(include=['metadata']):
+            blob_count += 1
+            logging.info(f"Blob {blob_count}: {blob.name}")
+            if blob.metadata:
+                logging.info(f"  Metadata: {blob.metadata}")
+                if blob.metadata.get('image_id') == image_id:
+                    target_blob = blob
+                    logging.info(f"  ✅ MATCH FOUND!")
+                    break
+            else:
+                logging.info(f"  No metadata found")
+        
+        logging.info(f"Total blobs found: {blob_count}")
+        
+        if not target_blob:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "error": f"Image with ID {image_id} not found. Searched {blob_count} blobs.",
+                    "debug": f"Looking for image_id: {image_id}",
+                    "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+                }),
+                status_code=404,
+                mimetype="application/json"
+            )
+        
+        # Get blob URL for Computer Vision API
+        blob_client = blob_service_client.get_blob_client(
+            container="images-upload", 
+            blob=target_blob.name
+        )
+        blob_url = blob_client.url
+        
+        # Initialize Computer Vision client
+        cv_client = get_computer_vision_client()
+        
+        # Perform comprehensive analysis
+        logging.info(f"Analyzing image: {blob_url}")
+        
+        # Visual features to extract
+        visual_features = [
+            VisualFeatureTypes.categories,
+            VisualFeatureTypes.description,
+            VisualFeatureTypes.faces,
+            VisualFeatureTypes.objects,
+            VisualFeatureTypes.tags,
+            VisualFeatureTypes.adult,
+            VisualFeatureTypes.color,
+            VisualFeatureTypes.image_type
+        ]
+        
+        # Call Computer Vision API
+        analysis_result = cv_client.analyze_image(blob_url, visual_features=visual_features)
+        
+        # Extract objects
+        objects = []
+        if analysis_result.objects:
+            for obj in analysis_result.objects:
+                objects.append({
+                    "name": obj.object_property,
+                    "confidence": round(obj.confidence, 4),
+                    "rectangle": {
+                        "x": obj.rectangle.x,
+                        "y": obj.rectangle.y,
+                        "w": obj.rectangle.w,
+                        "h": obj.rectangle.h
+                    }
+                })
+        
+        # Extract faces
+        faces = []
+        if analysis_result.faces:
+            for face in analysis_result.faces:
+                faces.append({
+                    "age": face.age,
+                    "gender": face.gender.value if face.gender else None,
+                    "rectangle": {
+                        "left": face.face_rectangle.left,
+                        "top": face.face_rectangle.top,
+                        "width": face.face_rectangle.width,
+                        "height": face.face_rectangle.height
+                    }
+                })
+        
+        # Extract descriptions
+        descriptions = []
+        if analysis_result.description and analysis_result.description.captions:
+            for caption in analysis_result.description.captions:
+                descriptions.append({
+                    "text": caption.text,
+                    "confidence": round(caption.confidence, 4)
+                })
+        
+        # Extract tags
+        tags = []
+        if analysis_result.tags:
+            for tag in analysis_result.tags:
+                tags.append({
+                    "name": tag.name,
+                    "confidence": round(tag.confidence, 4)
+                })
+        
+        # Extract categories
+        categories = []
+        if analysis_result.categories:
+            for category in analysis_result.categories:
+                categories.append({
+                    "name": category.name,
+                    "score": round(category.score, 4)
+                })
+        
+        # Perform OCR for text extraction
+        ocr_result = None
+        try:
+            read_operation = cv_client.read(blob_url, raw=True)
+            operation_id = read_operation.headers["Operation-Location"].split("/")[-1]
+            
+            # Wait for OCR to complete
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                read_result = cv_client.get_read_result(operation_id)
+                if read_result.status == OperationStatusCodes.succeeded:
+                    break
+                elif read_result.status == OperationStatusCodes.failed:
+                    logging.warning("OCR operation failed")
+                    break
+                time.sleep(1)
+            
+            # Extract text if successful
+            if read_result.status == OperationStatusCodes.succeeded:
+                extracted_text = []
+                for page in read_result.analyze_result.read_results:
+                    for line in page.lines:
+                        extracted_text.append({
+                            "text": line.text,
+                            "bounding_box": line.bounding_box
+                        })
+                
+                ocr_result = {
+                    "text_detected": len(extracted_text) > 0,
+                    "total_lines": len(extracted_text),
+                    "extracted_text": extracted_text[:20]  # Limit to first 20 lines
+                }
+        
+        except Exception as ocr_error:
+            logging.warning(f"OCR failed: {str(ocr_error)}")
+            ocr_result = {
+                "text_detected": False,
+                "error": str(ocr_error)
+            }
+        
+        # Compile comprehensive analysis results
+        analysis_data = {
+            "imageId": image_id,
+            "blobName": target_blob.name,
+            "analysis": {
+                "objects": objects,
+                "faces": faces,
+                "descriptions": descriptions,
+                "tags": tags,
+                "categories": categories,
+                "text": ocr_result,
+                "metadata": {
+                    "dominant_colors": list(analysis_result.color.dominant_colors) if analysis_result.color else [],
+                    "accent_color": analysis_result.color.accent_color if analysis_result.color else None,
+                    "is_bw_image": analysis_result.color.is_bw_img if analysis_result.color else False,
+                    "adult_content": {
+                        "is_adult": analysis_result.adult.is_adult_content if analysis_result.adult else False,
+                        "adult_score": round(analysis_result.adult.adult_score, 4) if analysis_result.adult else 0,
+                        "is_racy": analysis_result.adult.is_racy_content if analysis_result.adult else False,
+                        "racy_score": round(analysis_result.adult.racy_score, 4) if analysis_result.adult else 0
+                    }
+                }
+            },
+            "analysis_timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+        }
+        
+        logging.info(f"Analysis completed for image {image_id}")
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "message": "Image analysis completed successfully",
+                **analysis_data
+            }),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logging.error(f"Analysis function error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": f"Analysis error: {str(e)}",
                 "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
             }),
             status_code=500,
