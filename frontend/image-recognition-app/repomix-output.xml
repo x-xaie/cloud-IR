@@ -1,0 +1,1315 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+eslint.config.js
+index.html
+package.json
+public/vite.svg
+README.md
+src/App.css
+src/App.jsx
+src/assets/react.svg
+src/components/image/AnalyzeButton.jsx
+src/components/image/DescriptionTags.jsx
+src/components/image/FaceAnalysis.jsx
+src/components/image/ImageUpload.jsx
+src/components/image/ObjectDetection.jsx
+src/components/image/ResultCard.jsx
+src/components/image/ResultsViewer.jsx
+src/components/image/TextDetection.jsx
+src/components/layout/Footer.jsx
+src/components/layout/Header.jsx
+src/components/layout/PageSection.jsx
+src/components/ui/Badge.jsx
+src/components/ui/Card.jsx
+src/components/ui/ConfidenceBar.jsx
+src/components/ui/ErrorAlert.jsx
+src/components/ui/LoadingSpinner.jsx
+src/hooks/useImageAnalysis.js
+src/hooks/useImageUpload.js
+src/index.css
+src/main.jsx
+src/services/api.js
+src/utils/constants.js
+src/utils/fileValidation.js
+src/utils/formatters.js
+vite.config.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="eslint.config.js">
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="package.json">
+{
+  "name": "image-recognition-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "lucide-react": "^0.537.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.32.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.0"
+  }
+}
+</file>
+
+<file path="public/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+</file>
+
+<file path="README.md">
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+</file>
+
+<file path="src/App.css">
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+</file>
+
+<file path="src/App.jsx">
+import React, { useState } from 'react';
+import { Header } from './components/layout/Header.jsx';
+import { Footer } from './components/layout/Footer.jsx';
+import { PageSection } from './components/layout/PageSection.jsx';
+import { ImageUpload } from './components/image/ImageUpload.jsx';
+import { AnalyzeButton } from './components/image/AnalyzeButton.jsx';
+import { ResultsViewer } from './components/image/ResultsViewer.jsx';
+
+/**
+ * Main application component with organized structure
+ */
+const App = () => {
+  const [imageId, setImageId] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [results, setResults] = useState(null);
+
+  const handleUploadSuccess = (id, file) => {
+    setImageId(id);
+    setUploadedImage(file);
+    setResults(null);
+  };
+
+  const handleAnalysisComplete = (analysisResults) => {
+    setResults(analysisResults);
+  };
+
+  const resetApp = () => {
+    setImageId(null);
+    setUploadedImage(null);
+    setResults(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Header 
+        onReset={resetApp}
+        showResetButton={!!(imageId || results)}
+      />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="space-y-8 lg:space-y-12">
+          {/* Step 1: Upload */}
+          {!imageId && !results && (
+            <PageSection>
+              <div className="space-y-4">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                  Upload an Image to Get Started
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+                  Our AI will analyze your image and detect objects, faces, text, and provide detailed descriptions.
+                </p>
+              </div>
+              <ImageUpload onUploadSuccess={handleUploadSuccess} />
+            </PageSection>
+          )}
+
+          {/* Step 2: Analyze */}
+          {imageId && !results && (
+            <PageSection>
+              <div className="space-y-4">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                  Image Uploaded Successfully!
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  Click the button below to analyze your image with AI.
+                </p>
+              </div>
+              
+              {uploadedImage && (
+                <div className="max-w-sm mx-auto">
+                  <img 
+                    src={URL.createObjectURL(uploadedImage)} 
+                    alt="Uploaded preview" 
+                    className="w-full rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
+                  />
+                </div>
+              )}
+              
+              <AnalyzeButton 
+                imageId={imageId}
+                onAnalysisComplete={handleAnalysisComplete}
+              />
+            </PageSection>
+          )}
+
+          {/* Step 3: Results */}
+          {results && (
+            <div className="space-y-8">
+              <div className="text-center space-y-4">
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                  Analysis Results
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  Here's what our AI found in your image:
+                </p>
+              </div>
+              <ResultsViewer results={results} uploadedImage={uploadedImage} />
+            </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default App;
+</file>
+
+<file path="src/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="src/components/image/AnalyzeButton.jsx">
+// src/components/image/AnalyzeButton.jsx
+
+import React from 'react';
+import { Eye } from 'lucide-react';
+import { useImageAnalysis } from '../../hooks/useImageAnalysis.js';
+import { LoadingSpinner } from '../ui/LoadingSpinner.jsx';
+import { ErrorAlert } from '../ui/ErrorAlert.jsx';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Button component to trigger image analysis
+ * @param {object} props - Component props
+ * @param {string} props.imageId - ID of uploaded image
+ * @param {function} props.onAnalysisComplete - Analysis completion callback
+ */
+export const AnalyzeButton = ({ imageId, onAnalysisComplete }) => {
+  const { isAnalyzing, error, handleAnalysis, clearError } = useImageAnalysis();
+
+  const onAnalyze = async () => {
+    clearError();
+    await handleAnalysis(imageId, onAnalysisComplete);
+  };
+
+  return (
+    <div className="text-center space-y-4">
+      <button
+        onClick={onAnalyze}
+        disabled={isAnalyzing}
+        className={`px-8 py-4 bg-gradient-to-r ${UI_CONSTANTS.GRADIENTS.BLUE_PURPLE} hover:${UI_CONSTANTS.GRADIENTS.BLUE_PURPLE_HOVER} text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-3 mx-auto`}
+      >
+        {isAnalyzing ? (
+          <LoadingSpinner className="text-white" />
+        ) : (
+          <Eye className="w-5 h-5" />
+        )}
+        <span>{isAnalyzing ? 'Analyzing Image...' : 'Analyze Image'}</span>
+      </button>
+      
+      {error && (
+        <div className="max-w-md mx-auto">
+          <ErrorAlert message={error} />
+        </div>
+      )}
+    </div>
+  );
+};
+</file>
+
+<file path="src/components/image/DescriptionTags.jsx">
+// src/components/image/DescriptionTags.jsx
+
+import React from 'react';
+import { Tag } from 'lucide-react';
+import { ResultCard } from './ResultCard.jsx';
+import { Badge } from '../ui/Badge.jsx';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Component for displaying image description and tags
+ * @param {object} props - Component props
+ * @param {string} props.description - Image description
+ * @param {Array} props.tags - Image tags array
+ */
+export const DescriptionTags = ({ description, tags }) => (
+  <ResultCard 
+    icon={Tag} 
+    title="Description & Tags" 
+    gradient={UI_CONSTANTS.GRADIENTS.GREEN}
+  >
+    <div className="space-y-4">
+      {description && (
+        <div>
+          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Description:</h4>
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+            {description}
+          </p>
+        </div>
+      )}
+      
+      {tags && tags.length > 0 && (
+        <div>
+          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Tags:</h4>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag, index) => (
+              <Badge key={index} variant="green">
+                {typeof tag === 'string' ? tag : tag.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {(!description && (!tags || tags.length === 0)) && (
+        <p className="text-gray-500 dark:text-gray-400 italic">
+          {UI_CONSTANTS.MESSAGES.NO_DESCRIPTION}
+        </p>
+      )}
+    </div>
+  </ResultCard>
+);
+</file>
+
+<file path="src/components/image/FaceAnalysis.jsx">
+// src/components/image/FaceAnalysis.jsx
+
+import React from 'react';
+import { Users } from 'lucide-react';
+import { ResultCard } from './ResultCard.jsx';
+import { formatFaceCount } from '../../utils/formatters.js';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Component for displaying face analysis results
+ * @param {object} props - Component props
+ * @param {Array} props.faces - Detected faces array
+ */
+export const FaceAnalysis = ({ faces }) => (
+  <ResultCard 
+    icon={Users} 
+    title="Face Analysis" 
+    gradient={UI_CONSTANTS.GRADIENTS.PURPLE}
+  >
+    {faces && faces.length > 0 ? (
+      <div className="space-y-4">
+        {faces.map((face, index) => (
+          <div key={index} className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className="space-y-2 text-sm">
+              {face.age && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Age:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{face.age}</span>
+                </div>
+              )}
+              {face.gender && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Gender:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{face.gender}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {formatFaceCount(faces.length)}
+        </p>
+      </div>
+    ) : (
+      <p className="text-gray-500 dark:text-gray-400 italic">
+        {UI_CONSTANTS.MESSAGES.NO_FACES}
+      </p>
+    )}
+  </ResultCard>
+);
+</file>
+
+<file path="src/components/image/ImageUpload.jsx">
+// src/components/image/ImageUpload.jsx
+
+import React, { useState } from 'react';
+import { Upload } from 'lucide-react';
+import { useImageUpload } from '../../hooks/useImageUpload.js';
+import { LoadingSpinner } from '../ui/LoadingSpinner.jsx';
+import { ErrorAlert } from '../ui/ErrorAlert.jsx';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Image upload component with drag & drop functionality
+ * @param {object} props - Component props
+ * @param {function} props.onUploadSuccess - Success callback
+ */
+export const ImageUpload = ({ onUploadSuccess }) => {
+  const [dragActive, setDragActive] = useState(false);
+  const { isUploading, error, handleUpload, clearError } = useImageUpload();
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = async (file) => {
+    clearError();
+    await handleUpload(file, onUploadSuccess);
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto">
+      <div
+        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+          dragActive 
+            ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' 
+            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+        } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          accept="image/jpeg,image/jpg,image/png"
+          onChange={handleChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          disabled={isUploading}
+        />
+        
+        <div className="space-y-4">
+          <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${UI_CONSTANTS.GRADIENTS.BLUE_PURPLE} rounded-full flex items-center justify-center`}>
+            {isUploading ? (
+              <LoadingSpinner size="w-8 h-8" className="text-white" />
+            ) : (
+              <Upload className="w-8 h-8 text-white" />
+            )}
+          </div>
+          
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {isUploading ? 'Uploading...' : 'Upload Your Image'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {UI_CONSTANTS.MESSAGES.UPLOAD_INSTRUCTIONS}
+            </p>
+            <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+              {UI_CONSTANTS.FILE_REQUIREMENTS.map((req, index) => (
+                <p key={index}>{req}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {error && <ErrorAlert message={error} />}
+    </div>
+  );
+};
+</file>
+
+<file path="src/components/image/ObjectDetection.jsx">
+// src/components/image/ObjectDetection.jsx
+
+import React from 'react';
+import { Camera } from 'lucide-react';
+import { ResultCard } from './ResultCard.jsx';
+import { ConfidenceBar } from '../ui/ConfidenceBar.jsx';
+import { formatConfidencePercentage } from '../../utils/formatters.js';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Component for displaying object detection results
+ * @param {object} props - Component props
+ * @param {Array} props.objects - Detected objects array
+ */
+export const ObjectDetection = ({ objects }) => (
+  <ResultCard 
+    icon={Camera} 
+    title="Objects Detected" 
+    gradient={UI_CONSTANTS.GRADIENTS.BLUE}
+  >
+    {objects && objects.length > 0 ? (
+      <div className="space-y-4">
+        {objects.map((obj, index) => (
+          <div key={index} className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-gray-900 dark:text-white capitalize">
+                {obj.name || obj.object}
+              </span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {formatConfidencePercentage(obj.confidence)}%
+              </span>
+            </div>
+            <ConfidenceBar confidence={obj.confidence || 0} />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p className="text-gray-500 dark:text-gray-400 italic">
+        {UI_CONSTANTS.MESSAGES.NO_OBJECTS}
+      </p>
+    )}
+  </ResultCard>
+);
+</file>
+
+<file path="src/components/image/ResultCard.jsx">
+// src/components/image/ResultCard.jsx
+
+import React from 'react';
+import { Card } from '../ui/Card.jsx';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Reusable card component for displaying analysis results
+ * @param {object} props - Component props
+ * @param {React.Component} props.icon - Icon component
+ * @param {string} props.title - Card title
+ * @param {React.ReactNode} props.children - Card content
+ * @param {string} props.gradient - Gradient class name
+ */
+export const ResultCard = ({ icon: Icon, title, children, gradient }) => (
+  <Card className="overflow-hidden">
+    <div className={`p-4 bg-gradient-to-r ${gradient} text-white`}>
+      <div className="flex items-center space-x-3">
+        <Icon className="w-6 h-6" />
+        <h3 className="text-lg font-semibold">{title}</h3>
+      </div>
+    </div>
+    <div className="p-6">
+      {children}
+    </div>
+  </Card>
+);
+</file>
+
+<file path="src/components/image/ResultsViewer.jsx">
+// src/components/image/ResultsViewer.jsx
+
+import React from 'react';
+import { CheckCircle, Image } from 'lucide-react';
+import { Card } from '../ui/Card.jsx';
+import { ObjectDetection } from './ObjectDetection.jsx';
+import { FaceAnalysis } from './FaceAnalysis.jsx';
+import { DescriptionTags } from './DescriptionTags.jsx';
+import { TextDetection } from './TextDetection.jsx';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Component for displaying complete analysis results
+ * @param {object} props - Component props
+ * @param {object} props.results - Analysis results
+ * @param {File} props.uploadedImage - Original uploaded image file
+ */
+export const ResultsViewer = ({ results, uploadedImage }) => {
+  const { analysis } = results;
+
+  return (
+    <div className="w-full max-w-6xl mx-auto space-y-6">
+      {/* Success Message */}
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center space-x-3">
+        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+        <p className="text-green-700 dark:text-green-300 font-medium">
+          {UI_CONSTANTS.MESSAGES.ANALYSIS_COMPLETE}
+        </p>
+      </div>
+
+      {/* Image Preview */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+          <Image className="w-5 h-5" />
+          <span>Uploaded Image</span>
+        </h3>
+        <div className="flex justify-center">
+          <img 
+            src={URL.createObjectURL(uploadedImage)} 
+            alt="Uploaded" 
+            className="max-w-full max-h-64 rounded-lg shadow-sm object-contain"
+          />
+        </div>
+      </Card>
+
+      {/* Results Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ObjectDetection objects={analysis.objects} />
+        <FaceAnalysis faces={analysis.faces} />
+        <DescriptionTags 
+          description={analysis.description} 
+          tags={analysis.tags} 
+        />
+        <TextDetection text={analysis.text} />
+      </div>
+    </div>
+  );
+};
+</file>
+
+<file path="src/components/image/TextDetection.jsx">
+// src/components/image/TextDetection.jsx
+
+import React from 'react';
+import { FileText } from 'lucide-react';
+import { ResultCard } from './ResultCard.jsx';
+import { extractTextContent } from '../../utils/formatters.js';
+import { UI_CONSTANTS } from '../../utils/constants.js';
+
+/**
+ * Component for displaying detected text
+ * @param {object} props - Component props
+ * @param {string|object|array} props.text - Detected text data
+ */
+export const TextDetection = ({ text }) => {
+  const textContent = extractTextContent(text);
+  
+  return (
+    <ResultCard 
+      icon={FileText} 
+      title="Detected Text" 
+      gradient={UI_CONSTANTS.GRADIENTS.ORANGE}
+    >
+      {textContent ? (
+        <div className="space-y-3">
+          {typeof textContent === 'string' ? (
+            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed font-mono bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+              {textContent}
+            </p>
+          ) : Array.isArray(textContent) ? (
+            <div className="space-y-2">
+              {textContent.map((textItem, index) => (
+                <p key={index} className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed font-mono bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                  {textItem}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400 italic">
+              {UI_CONSTANTS.MESSAGES.NO_TEXT}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-gray-500 dark:text-gray-400 italic">
+          {UI_CONSTANTS.MESSAGES.NO_TEXT}
+        </p>
+      )}
+    </ResultCard>
+  );
+};
+</file>
+
+<file path="src/components/layout/Footer.jsx">
+// src/components/layout/Footer.jsx
+
+import React from 'react';
+
+/**
+ * Application footer component
+ */
+export const Footer = () => (
+  <footer className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm mt-16 lg:mt-20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="text-center text-gray-600 dark:text-gray-400">
+        <p className="text-sm">
+          Built with React + Tailwind CSS v4 • Powered by Azure Cognitive Services
+        </p>
+      </div>
+    </div>
+  </footer>
+);
+</file>
+
+<file path="src/components/layout/Header.jsx">
+// src/components/layout/Header.jsx
+
+import React from 'react';
+import { Eye } from 'lucide-react';
+
+/**
+ * Application header component
+ * @param {object} props - Component props
+ * @param {function} [props.onReset] - Reset callback for new upload
+ * @param {boolean} [props.showResetButton=false] - Whether to show reset button
+ */
+export const Header = ({ onReset, showResetButton = false }) => (
+  <header className="border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <Eye className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              AI Image Recognition
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Powered by Azure Cognitive Services
+            </p>
+          </div>
+        </div>
+        {showResetButton && (
+          <button
+            onClick={onReset}
+            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+          >
+            Upload New Image
+          </button>
+        )}
+      </div>
+    </div>
+  </header>
+);
+</file>
+
+<file path="src/components/layout/PageSection.jsx">
+// src/components/layout/PageSection.jsx
+
+import React from 'react';
+
+/**
+ * Generic page section wrapper with consistent spacing
+ * @param {object} props - Component props
+ * @param {React.ReactNode} props.children - Section content
+ * @param {string} [props.className=''] - Additional classes
+ */
+export const PageSection = ({ children, className = '' }) => (
+  <div className={`text-center space-y-8 ${className}`}>
+    {children}
+  </div>
+);
+</file>
+
+<file path="src/components/ui/Badge.jsx">
+// src/components/ui/Badge.jsx
+
+import React from 'react';
+
+/**
+ * Reusable badge component
+ * @param {object} props - Component props
+ * @param {React.ReactNode} props.children - Badge content
+ * @param {string} [props.variant='green'] - Color variant
+ */
+export const Badge = ({ children, variant = 'green' }) => {
+  const variants = {
+    green: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+    blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+    purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+  };
+
+  return (
+    <span className={`px-3 py-1 text-xs rounded-full font-medium ${variants[variant]}`}>
+      {children}
+    </span>
+  );
+};
+</file>
+
+<file path="src/components/ui/Card.jsx">
+// src/components/ui/Card.jsx
+
+import React from 'react';
+
+/**
+ * Generic card wrapper component
+ * @param {object} props - Component props
+ * @param {React.ReactNode} props.children - Card content
+ * @param {string} [props.className=''] - Additional classes
+ */
+export const Card = ({ children, className = '' }) => (
+  <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+    {children}
+  </div>
+);
+</file>
+
+<file path="src/components/ui/ConfidenceBar.jsx">
+// src/components/ui/ConfidenceBar.jsx
+
+import React from 'react';
+
+/**
+ * Confidence level visualization bar
+ * @param {object} props - Component props
+ * @param {number} props.confidence - Confidence value (0-1)
+ */
+export const ConfidenceBar = ({ confidence }) => (
+  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+    <div 
+      className="h-2 bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-500"
+      style={{ width: `${(confidence || 0) * 100}%` }}
+    />
+  </div>
+);
+</file>
+
+<file path="src/components/ui/ErrorAlert.jsx">
+// src/components/ui/ErrorAlert.jsx
+
+import React from 'react';
+import { AlertCircle } from 'lucide-react';
+
+/**
+ * Reusable error alert component
+ * @param {object} props - Component props
+ * @param {string} props.message - Error message to display
+ * @param {function} [props.onClose] - Close handler
+ */
+export const ErrorAlert = ({ message, onClose }) => (
+  <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-3">
+    <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+    <p className="text-red-700 dark:text-red-300 text-sm flex-1">{message}</p>
+    {onClose && (
+      <button
+        onClick={onClose}
+        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+      >
+        ×
+      </button>
+    )}
+  </div>
+);
+</file>
+
+<file path="src/components/ui/LoadingSpinner.jsx">
+// src/components/ui/LoadingSpinner.jsx
+
+import React from 'react';
+import { Loader2 } from 'lucide-react';
+
+/**
+ * Reusable loading spinner component
+ * @param {object} props - Component props
+ * @param {string} [props.size='w-5 h-5'] - Size classes
+ * @param {string} [props.className=''] - Additional classes
+ */
+export const LoadingSpinner = ({ size = 'w-5 h-5', className = '' }) => (
+  <Loader2 className={`${size} animate-spin ${className}`} />
+);
+</file>
+
+<file path="src/hooks/useImageAnalysis.js">
+// src/hooks/useImageAnalysis.js
+
+import { useState } from 'react';
+import { analyzeImage } from '../services/api.js';
+
+/**
+ * Custom hook for handling image analysis functionality
+ * @returns {object} Analysis state and methods
+ */
+export const useImageAnalysis = () => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleAnalysis = async (imageId, onSuccess) => {
+    setError('');
+    setIsAnalyzing(true);
+
+    try {
+      const results = await analyzeImage(imageId);
+      onSuccess(results);
+    } catch (err) {
+      setError(`Analysis failed: ${err.message}`);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const clearError = () => setError('');
+
+  return {
+    isAnalyzing,
+    error,
+    handleAnalysis,
+    clearError,
+  };
+};
+</file>
+
+<file path="src/hooks/useImageUpload.js">
+// src/hooks/useImageUpload.js
+
+import { useState } from 'react';
+import { uploadImage } from '../services/api.js';
+import { validateFile } from '../utils/fileValidation.js';
+
+/**
+ * Custom hook for handling image upload functionality
+ * @returns {object} Upload state and methods
+ */
+export const useImageUpload = () => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleUpload = async (file, onSuccess) => {
+    setError('');
+    
+    // Validate file
+    const validationError = validateFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const result = await uploadImage(file);
+      onSuccess(result.imageId, file);
+    } catch (err) {
+      setError(`Upload failed: ${err.message}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearError = () => setError('');
+
+  return {
+    isUploading,
+    error,
+    handleUpload,
+    clearError,
+  };
+};
+</file>
+
+<file path="src/index.css">
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: oklch(0.5 0.2 240);
+  --color-brand-purple: oklch(0.45 0.25 270);
+}
+</file>
+
+<file path="src/main.jsx">
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+</file>
+
+<file path="src/services/api.js">
+// src/services/api.js
+
+import { API_CONFIG } from '../utils/constants.js';
+
+/**
+ * Generic API error handler
+ * @param {Response} response - Fetch response
+ * @param {string} operation - Operation name for error context
+ */
+const handleApiError = async (response, operation) => {
+  if (!response.ok) {
+    throw new Error(`${operation} failed: ${response.statusText}`);
+  }
+};
+
+/**
+ * Upload image to server
+ * @param {File} file - Image file to upload
+ * @returns {Promise<object>} Upload result with imageId
+ */
+export const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOAD}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  await handleApiError(response, 'Upload');
+  return await response.json();
+};
+
+/**
+ * Analyze uploaded image
+ * @param {string} imageId - ID of uploaded image
+ * @returns {Promise<object>} Analysis results
+ */
+export const analyzeImage = async (imageId) => {
+  const endpoint = API_CONFIG.ENDPOINTS.ANALYZE.replace('{imageId}', imageId);
+  
+  const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  await handleApiError(response, 'Analysis');
+  return await response.json();
+};
+</file>
+
+<file path="src/utils/constants.js">
+// src/utils/constants.js
+
+/**
+ * API Configuration
+ */
+export const API_CONFIG = {
+  BASE_URL: 'https://func-imagerecognition-centralcanada-prod-hjedbmc9e5gcf6df.canadacentral-01.azurewebsites.net',
+  //BASE_URL: 'http://localhost:7071',
+  ENDPOINTS: {
+    UPLOAD: '/api/images/upload',
+    ANALYZE: '/api/images/{imageId}/analyze',
+  },
+};
+
+/**
+ * File Validation Rules
+ */
+export const FILE_VALIDATION = {
+  ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png'],
+  MAX_SIZE: 4 * 1024 * 1024, // 4MB
+  MAX_DIMENSIONS: 4000,
+};
+
+/**
+ * UI Constants
+ */
+export const UI_CONSTANTS = {
+  GRADIENTS: {
+    BLUE_PURPLE: 'from-blue-500 to-purple-600',
+    BLUE_PURPLE_HOVER: 'from-blue-700 to-purple-700',
+    BLUE: 'from-blue-500 to-blue-600',
+    PURPLE: 'from-purple-500 to-purple-600',
+    GREEN: 'from-green-500 to-green-600',
+    ORANGE: 'from-orange-500 to-orange-600',
+  },
+  MESSAGES: {
+    UPLOAD_SUCCESS: 'Image uploaded successfully!',
+    ANALYSIS_COMPLETE: 'Image analysis completed successfully!',
+    UPLOAD_INSTRUCTIONS: 'Drag and drop your image here, or click to browse',
+    NO_OBJECTS: 'No objects detected',
+    NO_FACES: 'No faces detected',
+    NO_TEXT: 'No text detected',
+    NO_DESCRIPTION: 'No description or tags available',
+  },
+  FILE_REQUIREMENTS: [
+    '• Supported formats: JPG, PNG',
+    '• Maximum size: 4MB',
+    '• Maximum dimensions: 4000×4000px',
+  ],
+};
+</file>
+
+<file path="src/utils/fileValidation.js">
+// src/utils/fileValidation.js
+
+import { FILE_VALIDATION } from './constants.js';
+
+/**
+ * Validates uploaded file against size and type requirements
+ * @param {File} file - The file to validate
+ * @returns {string|null} Error message or null if valid
+ */
+export const validateFile = (file) => {
+  if (!file) {
+    return 'No file provided';
+  }
+
+  // Check file type
+  if (!FILE_VALIDATION.ALLOWED_TYPES.includes(file.type)) {
+    return 'Only JPG and PNG files are allowed';
+  }
+
+  // Check file size
+  if (file.size > FILE_VALIDATION.MAX_SIZE) {
+    return 'File size must be less than 4MB';
+  }
+
+  return null;
+};
+</file>
+
+<file path="src/utils/formatters.js">
+// src/utils/formatters.js
+
+/**
+ * Formats confidence score as percentage
+ * @param {number} confidence - Confidence score (0-1)
+ * @returns {number} Percentage (0-100)
+ */
+export const formatConfidencePercentage = (confidence) => {
+  return Math.round((confidence || 0) * 100);
+};
+
+/**
+ * Formats face count text
+ * @param {number} count - Number of faces
+ * @returns {string} Formatted text
+ */
+export const formatFaceCount = (count) => {
+  return `${count} face${count !== 1 ? 's' : ''} detected`;
+};
+
+/**
+ * Extracts text content from various text analysis formats
+ * @param {string|object|array} textData - Text data from analysis
+ * @returns {string|array} Formatted text content
+ */
+export const extractTextContent = (textData) => {
+  if (!textData) return null;
+  
+  if (typeof textData === 'string') {
+    return textData;
+  }
+  
+  if (textData.text) {
+    return textData.text;
+  }
+  
+  if (Array.isArray(textData)) {
+    return textData.map(item => 
+      typeof item === 'string' ? item : item.text || item
+    );
+  }
+  
+  return null;
+};
+</file>
+
+<file path="vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss()
+  ],
+})
+</file>
+
+</files>
