@@ -49,6 +49,10 @@ README.md
 src/App.css
 src/App.jsx
 src/assets/react.svg
+src/components/health/ClickableHealthIndicator.jsx
+src/components/health/HealthDashboardModal.jsx
+src/components/health/HealthIndicator.jsx
+src/components/health/HealthStatus.jsx
 src/components/image/AnalyzeButton.jsx
 src/components/image/DescriptionTags.jsx
 src/components/image/FaceAnalysis.jsx
@@ -60,16 +64,20 @@ src/components/image/TextDetection.jsx
 src/components/layout/Footer.jsx
 src/components/layout/Header.jsx
 src/components/layout/PageSection.jsx
+src/components/pages/HealthDashboard.jsx
 src/components/ui/Badge.jsx
 src/components/ui/Card.jsx
 src/components/ui/ConfidenceBar.jsx
 src/components/ui/ErrorAlert.jsx
 src/components/ui/LoadingSpinner.jsx
+src/components/ui/Modal.jsx
+src/hooks/useHealthCheck.js
 src/hooks/useImageAnalysis.js
 src/hooks/useImageUpload.js
 src/index.css
 src/main.jsx
 src/services/api.js
+src/services/healthService.js
 src/utils/constants.js
 src/utils/fileValidation.js
 src/utils/formatters.js
@@ -143,12 +151,26 @@ export default defineConfig([
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    
+    <!-- 🔖 Title & Description -->
+    <title>AI Image Recognition App</title>
+    <meta name="description" content="Upload and analyze images using AI. Detect objects, faces, text, and more with Azure Cognitive Services." />
+
+    <!-- 🎨 Theme & Favicon -->
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <!-- 📱 Social Sharing (Open Graph) -->
+    <meta property="og:title" content="AI Image Recognition App" />
+    <meta property="og:description" content="Analyze images with AI to detect objects, faces, and text." />
+    <meta property="og:image" content="/vite.svg" />
+    <meta property="og:type" content="website" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <noscript>Please enable JavaScript to run this app.</noscript>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
@@ -258,6 +280,7 @@ import { PageSection } from './components/layout/PageSection.jsx';
 import { ImageUpload } from './components/image/ImageUpload.jsx';
 import { AnalyzeButton } from './components/image/AnalyzeButton.jsx';
 import { ResultsViewer } from './components/image/ResultsViewer.jsx';
+import { HealthDashboardModal } from './components/health/HealthDashboardModal.jsx';
 
 /**
  * Main application component with organized structure
@@ -266,6 +289,7 @@ const App = () => {
   const [imageId, setImageId] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [results, setResults] = useState(null);
+  const [isHealthDashboardOpen, setIsHealthDashboardOpen] = useState(false);
 
   const handleUploadSuccess = (id, file) => {
     setImageId(id);
@@ -283,11 +307,21 @@ const App = () => {
     setResults(null);
   };
 
+  const openHealthDashboard = () => {
+    setIsHealthDashboardOpen(true);
+  };
+
+  const closeHealthDashboard = () => {
+    setIsHealthDashboardOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header 
         onReset={resetApp}
         showResetButton={!!(imageId || results)}
+        showHealthStatus={true}
+        onHealthClick={openHealthDashboard}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
@@ -347,13 +381,23 @@ const App = () => {
                   Here's what our AI found in your image:
                 </p>
               </div>
-              <ResultsViewer results={results} uploadedImage={uploadedImage} />
+              <ResultsViewer 
+                results={results} 
+                uploadedImage={uploadedImage}
+                onViewAnalytics={openHealthDashboard}
+              />
             </div>
           )}
         </div>
       </main>
 
       <Footer />
+
+      {/* Health Dashboard Modal - Rendered at App level */}
+      <HealthDashboardModal 
+        isOpen={isHealthDashboardOpen}
+        onClose={closeHealthDashboard}
+      />
     </div>
   );
 };
@@ -363,6 +407,499 @@ export default App;
 
 <file path="src/assets/react.svg">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="src/components/health/ClickableHealthIndicator.jsx">
+// src/components/health/ClickableHealthIndicator.jsx
+
+import React, { useState } from 'react';
+import { 
+  Loader2, 
+  Clock, 
+  Wifi,
+  WifiOff,
+  Activity,
+  ChevronDown
+} from 'lucide-react';
+import { useHealthCheck } from '../../hooks/useHealthCheck.js';
+import { HealthDashboardModal } from './HealthDashboardModal.jsx';
+
+/**
+ * Clickable health status indicator for header with modal dashboard
+ * @param {object} props - Component props
+ * @param {boolean} [props.showDropdown=false] - Show dropdown on hover
+ */
+export const ClickableHealthIndicator = ({ showDropdown = false }) => {
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const { 
+    isHealthy, 
+    isChecking, 
+    responseTime, 
+    formattedResponseTime, 
+    error,
+    lastChecked 
+  } = useHealthCheck({
+    interval: 30000,
+    autoStart: true
+  });
+
+  const getStatusIcon = () => {
+    if (isChecking) return <Loader2 className="w-4 h-4 animate-spin" />;
+    if (isHealthy === null) return <Clock className="w-4 h-4" />;
+    return isHealthy ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />;
+  };
+
+  const getStatusColor = () => {
+    if (isChecking) return 'text-blue-500';
+    if (isHealthy === null) return 'text-gray-500';
+    return isHealthy ? 'text-green-500' : 'text-red-500';
+  };
+
+  const getStatusText = () => {
+    if (isChecking) return 'Checking...';
+    if (isHealthy === null) return 'Unknown';
+    return isHealthy ? 'Online' : 'Offline';
+  };
+
+  const getBgColor = () => {
+    if (isChecking) return 'hover:bg-blue-50 dark:hover:bg-blue-900/20';
+    if (isHealthy === null) return 'hover:bg-gray-50 dark:hover:bg-gray-700/50';
+    return isHealthy ? 'hover:bg-green-50 dark:hover:bg-green-900/20' : 'hover:bg-red-50 dark:hover:bg-red-900/20';
+  };
+
+  const formatLastChecked = (timestamp) => {
+    if (!timestamp) return 'Never';
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  return (
+    <div className="relative">
+      {/* Clickable Health Indicator */}
+      <button
+        onClick={() => setIsDashboardOpen(true)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getBgColor()} ${getStatusColor()}`}
+        title="Click to view detailed health dashboard"
+      >
+        {getStatusIcon()}
+        <span className="text-sm font-medium">{getStatusText()}</span>
+        {responseTime && (
+          <span className="text-xs opacity-75">({formattedResponseTime})</span>
+        )}
+        {showDropdown && (
+          <ChevronDown className="w-3 h-3 opacity-50" />
+        )}
+      </button>
+
+      {/* Quick Status Dropdown (on hover) - Fixed z-index */}
+      {showDropdown && isHovered && (
+        <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-[9998]">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Service Status:</span>
+              <span className={`text-sm font-medium ${getStatusColor()}`}>
+                {getStatusText()}
+              </span>
+            </div>
+            
+            {responseTime && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Response Time:</span>
+                <span className={`text-sm font-medium ${
+                  responseTime < 1000 ? 'text-green-600' : 
+                  responseTime < 3000 ? 'text-yellow-600' : 'text-red-600'
+                }`}>
+                  {formattedResponseTime}
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Last Checked:</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                {formatLastChecked(lastChecked)}
+              </span>
+            </div>
+
+            {error && (
+              <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
+                <p className="text-xs text-red-700 dark:text-red-300">{error}</p>
+              </div>
+            )}
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+              <button
+                onClick={() => setIsDashboardOpen(true)}
+                className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Activity className="w-4 h-4" />
+                <span>View Dashboard</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Health Dashboard Modal - Now with proper z-index */}
+      <HealthDashboardModal 
+        isOpen={isDashboardOpen}
+        onClose={() => setIsDashboardOpen(false)}
+      />
+    </div>
+  );
+};
+</file>
+
+<file path="src/components/health/HealthDashboardModal.jsx">
+// src/components/health/HealthDashboardModal.jsx
+
+import React from 'react';
+import { Modal } from '../ui/Modal.jsx';
+import { HealthDashboard } from '../pages/HealthDashboard.jsx';
+
+/**
+ * Health dashboard in a modal wrapper
+ * @param {object} props - Component props
+ * @param {boolean} props.isOpen - Whether modal is open
+ * @param {function} props.onClose - Close handler
+ */
+export const HealthDashboardModal = ({ isOpen, onClose }) => {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="max-w-6xl">
+      <HealthDashboard />
+    </Modal>
+  );
+};
+</file>
+
+<file path="src/components/health/HealthIndicator.jsx">
+// src/components/health/HealthIndicator.jsx
+
+import React from 'react';
+import { 
+  Loader2, 
+  Clock, 
+  Wifi,
+  WifiOff
+} from 'lucide-react';
+import { useHealthCheck } from '../../hooks/useHealthCheck.js';
+
+/**
+ * Simple health status indicator for header (no modal inside)
+ * @param {object} props - Component props
+ * @param {function} [props.onClick] - Click handler passed from parent
+ */
+export const HealthIndicator = ({ onClick }) => {
+  const { 
+    isHealthy, 
+    isChecking, 
+    responseTime, 
+    formattedResponseTime, 
+    error
+  } = useHealthCheck({
+    interval: 30000,
+    autoStart: true
+  });
+
+  const getStatusIcon = () => {
+    if (isChecking) return <Loader2 className="w-4 h-4 animate-spin" />;
+    if (isHealthy === null) return <Clock className="w-4 h-4" />;
+    return isHealthy ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />;
+  };
+
+  const getStatusColor = () => {
+    if (isChecking) return 'text-blue-500';
+    if (isHealthy === null) return 'text-gray-500';
+    return isHealthy ? 'text-green-500' : 'text-red-500';
+  };
+
+  const getStatusText = () => {
+    if (isChecking) return 'Checking...';
+    if (isHealthy === null) return 'Unknown';
+    return isHealthy ? 'Online' : 'Offline';
+  };
+
+  const getBgColor = () => {
+    if (isChecking) return 'hover:bg-blue-50 dark:hover:bg-blue-900/20';
+    if (isHealthy === null) return 'hover:bg-gray-50 dark:hover:bg-gray-700/50';
+    return isHealthy ? 'hover:bg-green-50 dark:hover:bg-green-900/20' : 'hover:bg-red-50 dark:hover:bg-red-900/20';
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getBgColor()} ${getStatusColor()}`}
+      title={error ? `Error: ${error}` : "Click to view health dashboard"}
+    >
+      {getStatusIcon()}
+      <span className="text-sm font-medium">{getStatusText()}</span>
+      {responseTime && (
+        <span className="text-xs opacity-75">({formattedResponseTime})</span>
+      )}
+    </button>
+  );
+};
+</file>
+
+<file path="src/components/health/HealthStatus.jsx">
+// src/components/health/HealthStatus.jsx
+
+import React, { useState } from 'react';
+import { 
+  Heart, 
+  AlertCircle, 
+  CheckCircle, 
+  Loader2, 
+  Clock, 
+  Server,
+  Wifi,
+  WifiOff,
+  Activity, 
+  RefreshCw, 
+  Settings, 
+  Eye, 
+  EyeOff,
+  Play,
+  Pause
+} from 'lucide-react';
+import { useHealthCheck } from '../../hooks/useHealthCheck.js';
+import { Card } from '../ui/Card.jsx';
+
+/**
+ * Compact health status indicator for header
+ * @param {object} props - Component props
+ * @param {boolean} [props.showDetails=false] - Show detailed info
+ */
+export const HealthIndicator = ({ showDetails = false }) => {
+  const { isHealthy, isChecking, responseTime, formattedResponseTime, error } = useHealthCheck({
+    interval: 30000, // Check every 30 seconds
+    autoStart: true
+  });
+
+  const getStatusIcon = () => {
+    if (isChecking) return <Loader2 className="w-4 h-4 animate-spin" />;
+    if (isHealthy === null) return <Clock className="w-4 h-4" />;
+    return isHealthy ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />;
+  };
+
+  const getStatusColor = () => {
+    if (isChecking) return 'text-blue-500';
+    if (isHealthy === null) return 'text-gray-500';
+    return isHealthy ? 'text-green-500' : 'text-red-500';
+  };
+
+  const getStatusText = () => {
+    if (isChecking) return 'Checking...';
+    if (isHealthy === null) return 'Unknown';
+    return isHealthy ? 'Online' : 'Offline';
+  };
+
+  if (!showDetails) {
+    // Compact version for header
+    return (
+      <div className={`flex items-center space-x-2 ${getStatusColor()}`} title={error || getStatusText()}>
+        {getStatusIcon()}
+        <span className="text-sm font-medium">{getStatusText()}</span>
+        {responseTime && (
+          <span className="text-xs opacity-75">({formattedResponseTime})</span>
+        )}
+      </div>
+    );
+  }
+
+  // Detailed version
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
+          <Heart className="w-5 h-5 text-red-500" />
+          <span>Service Health</span>
+        </h3>
+        <div className={`flex items-center space-x-2 ${getStatusColor()}`}>
+          {getStatusIcon()}
+          <span className="font-medium">{getStatusText()}</span>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {responseTime && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 dark:text-gray-400">Response Time:</span>
+            <span className={`font-medium ${responseTime < 1000 ? 'text-green-600' : responseTime < 3000 ? 'text-yellow-600' : 'text-red-600'}`}>
+              {formattedResponseTime}
+            </span>
+          </div>
+        )}
+
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-red-700 dark:text-red-300 text-sm font-medium">Connection Error</p>
+                <p className="text-red-600 dark:text-red-400 text-xs mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Detailed health monitoring component
+ */
+export const HealthMonitor = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const {
+    isHealthy,
+    isChecking,
+    responseTime,
+    formattedResponseTime,
+    lastChecked,
+    error,
+    backend,
+    services,
+    isMonitoring,
+    checkHealth,
+    toggleMonitoring
+  } = useHealthCheck({
+    interval: 30000,
+    autoStart: true
+  });
+
+  const formatLastChecked = (timestamp) => {
+    if (!timestamp) return 'Never';
+    return new Date(timestamp).toLocaleTimeString();
+  };
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Activity className="w-5 h-5" />
+            <h3 className="text-base font-medium">System Health</h3>
+          </div>
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={checkHealth}
+              disabled={isChecking}
+              className="p-1.5 hover:bg-white/20 rounded-md transition-colors disabled:opacity-50"
+              title="Refresh health check"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={toggleMonitoring}
+              className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
+              title={isMonitoring ? 'Stop monitoring' : 'Start monitoring'}
+            >
+              {isMonitoring ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            </button>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1.5 hover:bg-white/20 rounded-md transition-colors"
+            >
+              {isExpanded ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4">
+        {/* Quick Status */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className={`text-lg font-semibold ${isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+              {isHealthy === null ? '?' : (isHealthy ? '✓' : '✗')}
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              {isHealthy === null ? 'Unknown' : (isHealthy ? 'Healthy' : 'Unhealthy')}
+            </p>
+          </div>
+
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className={`text-lg font-semibold ${
+              responseTime ? (
+                responseTime < 1000 ? 'text-green-600' : 
+                responseTime < 3000 ? 'text-yellow-600' : 'text-red-600'
+              ) : 'text-gray-500'
+            }`}>
+              {formattedResponseTime}
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Response</p>
+          </div>
+
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div className="text-lg font-semibold text-blue-600">
+              {isMonitoring ? '●' : '○'}
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              {isMonitoring ? 'Live' : 'Paused'}
+            </p>
+          </div>
+        </div>
+
+        {/* Detailed Info */}
+        {isExpanded && (
+          <div className="space-y-3">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+              <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm">Service Details</h4>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Last Checked:</p>
+                  <p className="font-medium">{formatLastChecked(lastChecked)}</p>
+                </div>
+                
+                {backend && (
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Version:</p>
+                    <p className="font-medium">{backend.version || 'Unknown'}</p>
+                  </div>
+                )}
+              </div>
+
+              {services && (
+                <div className="mt-3">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Services:</p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {Object.entries(services).map(([service, status]) => (
+                      <div key={service} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded text-xs">
+                        <span className="capitalize">{service}</span>
+                        <span className={`px-1.5 py-0.5 rounded-full font-medium ${
+                          status === 'healthy' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                          status === 'unhealthy' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
+                          'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+                        }`}>
+                          {status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <h5 className="font-medium text-red-800 dark:text-red-300 mb-1 text-sm">Error Details</h5>
+                <p className="text-red-700 dark:text-red-400 text-xs">{error}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 </file>
 
 <file path="src/components/image/AnalyzeButton.jsx">
@@ -704,7 +1241,7 @@ export const ResultCard = ({ icon: Icon, title, children, gradient }) => (
 // src/components/image/ResultsViewer.jsx
 
 import React from 'react';
-import { CheckCircle, Image } from 'lucide-react';
+import { CheckCircle, Image, BarChart3 } from 'lucide-react';
 import { Card } from '../ui/Card.jsx';
 import { ObjectDetection } from './ObjectDetection.jsx';
 import { FaceAnalysis } from './FaceAnalysis.jsx';
@@ -717,8 +1254,9 @@ import { UI_CONSTANTS } from '../../utils/constants.js';
  * @param {object} props - Component props
  * @param {object} props.results - Analysis results
  * @param {File} props.uploadedImage - Original uploaded image file
+ * @param {function} [props.onViewAnalytics] - Analytics button click handler
  */
-export const ResultsViewer = ({ results, uploadedImage }) => {
+export const ResultsViewer = ({ results, uploadedImage, onViewAnalytics }) => {
   const { analysis } = results;
 
   return (
@@ -756,6 +1294,22 @@ export const ResultsViewer = ({ results, uploadedImage }) => {
         />
         <TextDetection text={analysis.text} />
       </div>
+
+      {/* Analytics Button */}
+      {onViewAnalytics && (
+        <div className="text-center pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={onViewAnalytics}
+            className="inline-flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span>View System Analytics</span>
+          </button>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+            See how our AI performed and explore usage statistics
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -840,14 +1394,22 @@ export const Footer = () => (
 
 import React from 'react';
 import { Eye } from 'lucide-react';
+import { HealthIndicator } from '../health/HealthIndicator.jsx';
 
 /**
  * Application header component
  * @param {object} props - Component props
  * @param {function} [props.onReset] - Reset callback for new upload
  * @param {boolean} [props.showResetButton=false] - Whether to show reset button
+ * @param {boolean} [props.showHealthStatus=true] - Whether to show health indicator
+ * @param {function} [props.onHealthClick] - Health indicator click handler
  */
-export const Header = ({ onReset, showResetButton = false }) => (
+export const Header = ({ 
+  onReset, 
+  showResetButton = false, 
+  showHealthStatus = true,
+  onHealthClick
+}) => (
   <header className="border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex items-center justify-between">
@@ -864,14 +1426,20 @@ export const Header = ({ onReset, showResetButton = false }) => (
             </p>
           </div>
         </div>
-        {showResetButton && (
-          <button
-            onClick={onReset}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-          >
-            Upload New Image
-          </button>
-        )}
+        
+        <div className="flex items-center space-x-4">
+          {showHealthStatus && (
+            <HealthIndicator onClick={onHealthClick} />
+          )}
+          {showResetButton && (
+            <button
+              onClick={onReset}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+            >
+              Upload New Image
+            </button>
+          )}
+        </div>
       </div>
     </div>
   </header>
@@ -894,6 +1462,223 @@ export const PageSection = ({ children, className = '' }) => (
     {children}
   </div>
 );
+</file>
+
+<file path="src/components/pages/HealthDashboard.jsx">
+// src/components/pages/HealthDashboard.jsx
+
+import React, { useState, useEffect } from 'react';
+import { 
+  Activity, 
+  BarChart3, 
+  Clock, 
+  Database,
+  Image as ImageIcon,
+  Users,
+  FileText,
+  TrendingUp
+} from 'lucide-react';
+import { HealthMonitor } from '../health/HealthStatus.jsx';
+import { Card } from '../ui/Card.jsx';
+import { API_CONFIG } from '../../utils/constants.js';
+
+/**
+ * Health Dashboard Page - Optional admin/monitoring view
+ */
+export const HealthDashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchStats = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/results/stats?days_back=7`);
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      
+      const data = await response.json();
+      setStats(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+    // Refresh stats every 5 minutes
+    const interval = setInterval(fetchStats, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const StatCard = ({ icon: Icon, title, value, subtitle, color = 'blue' }) => (
+    <Card className="p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">{title}</p>
+          <p className={`text-xl font-semibold text-${color}-600`}>{value}</p>
+          {subtitle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+          )}
+        </div>
+        <div className={`p-2 bg-${color}-100 dark:bg-${color}-900/30 rounded-lg`}>
+          <Icon className={`w-4 h-4 text-${color}-600`} />
+        </div>
+      </div>
+    </Card>
+  );
+
+  return (
+    <div className="bg-white dark:bg-gray-800">
+      <div className="max-w-6xl mx-auto px-6 py-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
+            <Activity className="w-6 h-6 text-blue-600" />
+            <span>System Health</span>
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            Service status and usage analytics
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Health Monitor */}
+          <HealthMonitor />
+
+          {/* Usage Statistics */}
+          {stats && (
+            <>
+              <div>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Usage Statistics (7 days)</span>
+                </h2>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <StatCard
+                    icon={ImageIcon}
+                    title="Total Images"
+                    value={stats.summary.total_images_analyzed}
+                    subtitle="analyzed"
+                    color="blue"
+                  />
+                  
+                  <StatCard
+                    icon={Users}
+                    title="With Faces"
+                    value={stats.summary.images_with_faces}
+                    subtitle={`${stats.percentages.faces}%`}
+                    color="purple"
+                  />
+                  
+                  <StatCard
+                    icon={Database}
+                    title="Objects Found"
+                    value={stats.summary.total_objects_detected}
+                    subtitle={`${stats.percentages.objects}%`}
+                    color="green"
+                  />
+                  
+                  <StatCard
+                    icon={FileText}
+                    title="With Text"
+                    value={stats.summary.images_with_text}
+                    subtitle={`${stats.percentages.text}%`}
+                    color="orange"
+                  />
+                </div>
+              </div>
+
+              {/* Performance Metrics */}
+              <div>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Performance</span>
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="p-4">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Avg Confidence</p>
+                      <p className="text-2xl font-semibold text-blue-600">
+                        {(stats.summary.average_confidence * 100).toFixed(1)}%
+                      </p>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
+                        <div 
+                          className="h-1.5 bg-blue-600 rounded-full transition-all duration-500"
+                          style={{ width: `${stats.summary.average_confidence * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Faces</p>
+                      <p className="text-2xl font-semibold text-purple-600">
+                        {stats.summary.total_faces_detected}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        detected
+                      </p>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Time Period</p>
+                      <p className="text-2xl font-semibold text-green-600">7d</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        of data
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <Card className="p-4">
+              <div className="text-center">
+                <div className="text-red-500 mb-3">
+                  <Activity className="w-8 h-8 mx-auto" />
+                </div>
+                <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">
+                  Unable to Load Statistics
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{error}</p>
+                <button
+                  onClick={fetchStats}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isLoading ? 'Retrying...' : 'Retry'}
+                </button>
+              </div>
+            </Card>
+          )}
+
+          {/* Loading State */}
+          {isLoading && !stats && (
+            <Card className="p-6">
+              <div className="text-center">
+                <div className="animate-spin text-blue-500 mb-3">
+                  <Clock className="w-6 h-6 mx-auto" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Loading statistics...</p>
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 </file>
 
 <file path="src/components/ui/Badge.jsx">
@@ -1003,6 +1788,201 @@ import { Loader2 } from 'lucide-react';
 export const LoadingSpinner = ({ size = 'w-5 h-5', className = '' }) => (
   <Loader2 className={`${size} animate-spin ${className}`} />
 );
+</file>
+
+<file path="src/components/ui/Modal.jsx">
+// src/components/ui/Modal.jsx
+
+import React from 'react';
+import { X } from 'lucide-react';
+
+/**
+ * Generic modal wrapper component
+ * @param {object} props - Component props
+ * @param {boolean} props.isOpen - Whether modal is open
+ * @param {function} props.onClose - Close handler
+ * @param {React.ReactNode} props.children - Modal content
+ * @param {string} [props.size='max-w-4xl'] - Modal size
+ */
+export const Modal = ({ isOpen, onClose, children, size = 'max-w-4xl' }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        {/* Background overlay */}
+        <div 
+          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75"
+          onClick={onClose}
+        />
+
+        {/* Modal */}
+        <div className={`inline-block w-full ${size} my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl relative z-[10000]`}>
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors z-[10001]"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Content */}
+          <div className="max-h-[90vh] overflow-y-auto">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+</file>
+
+<file path="src/hooks/useHealthCheck.js">
+// src/hooks/useHealthCheck.js
+
+import { useState, useEffect, useRef } from 'react';
+import { HealthService } from '../services/healthService.js';
+
+/**
+ * Custom hook for monitoring backend health
+ * @param {object} options - Configuration options
+ * @param {number} [options.interval=30000] - Check interval in ms (default 30s)
+ * @param {boolean} [options.autoStart=true] - Start monitoring automatically
+ * @param {boolean} [options.checkOnMount=true] - Check health on component mount
+ * @returns {object} Health state and methods
+ */
+export const useHealthCheck = ({
+  interval = 30000, // 30 seconds
+  autoStart = true,
+  checkOnMount = true
+} = {}) => {
+  const [healthStatus, setHealthStatus] = useState({
+    isHealthy: null,
+    lastChecked: null,
+    responseTime: null,
+    isChecking: false,
+    error: null
+  });
+
+  const healthService = useRef(new HealthService());
+  const intervalRef = useRef(null);
+  const isMountedRef = useRef(true);
+
+  /**
+   * Perform health check
+   */
+  const checkHealth = async () => {
+    if (!isMountedRef.current) return;
+
+    setHealthStatus(prev => ({ ...prev, isChecking: true, error: null }));
+
+    try {
+      const health = await healthService.current.checkHealth();
+      
+      if (isMountedRef.current) {
+        setHealthStatus({
+          isHealthy: health.isHealthy,
+          lastChecked: health.lastChecked,
+          responseTime: health.responseTime,
+          isChecking: false,
+          error: health.error || null,
+          backend: health.backend,
+          services: health.services
+        });
+      }
+    } catch (error) {
+      if (isMountedRef.current) {
+        setHealthStatus(prev => ({
+          ...prev,
+          isChecking: false,
+          error: error.message,
+          isHealthy: false
+        }));
+      }
+    }
+  };
+
+  /**
+   * Start periodic health monitoring
+   */
+  const startMonitoring = () => {
+    if (intervalRef.current) return; // Already running
+
+    // Initial check
+    checkHealth();
+
+    // Set up interval
+    intervalRef.current = setInterval(() => {
+      checkHealth();
+    }, interval);
+  };
+
+  /**
+   * Stop periodic health monitoring
+   */
+  const stopMonitoring = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  /**
+   * Toggle monitoring on/off
+   */
+  const toggleMonitoring = () => {
+    if (intervalRef.current) {
+      stopMonitoring();
+    } else {
+      startMonitoring();
+    }
+  };
+
+  // Mount effect
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    if (checkOnMount) {
+      checkHealth();
+    }
+
+    if (autoStart) {
+      startMonitoring();
+    }
+
+    return () => {
+      isMountedRef.current = false;
+      stopMonitoring();
+    };
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopMonitoring();
+    };
+  }, []);
+
+  return {
+    // Health status
+    ...healthStatus,
+    
+    // Methods
+    checkHealth,
+    startMonitoring,
+    stopMonitoring,
+    toggleMonitoring,
+    
+    // Computed values
+    isMonitoring: intervalRef.current !== null,
+    statusColor: healthService.current.getStatusColor(),
+    statusText: healthService.current.getStatusText(),
+    formattedResponseTime: healthService.current.getFormattedResponseTime(),
+    
+    // Utilities
+    getHealthService: () => healthService.current
+  };
+};
 </file>
 
 <file path="src/hooks/useImageAnalysis.js">
@@ -1166,6 +2146,141 @@ export const analyzeImage = async (imageId) => {
   await handleApiError(response, 'Analysis');
   return await response.json();
 };
+</file>
+
+<file path="src/services/healthService.js">
+// src/services/healthService.js
+
+import { API_CONFIG } from '../utils/constants.js';
+
+/**
+ * Health check service for monitoring backend status
+ */
+export class HealthService {
+  constructor() {
+    this.lastHealthCheck = null;
+    this.healthStatus = {
+      isHealthy: null,
+      lastChecked: null,
+      services: {},
+      responseTime: null
+    };
+  }
+
+  /**
+   * Perform comprehensive health check
+   * @returns {Promise<object>} Health status
+   */
+  async checkHealth() {
+    const startTime = Date.now();
+
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout
+        signal: AbortSignal.timeout(5000)
+      });
+
+      const responseTime = Date.now() - startTime;
+      
+      if (!response.ok) {
+        throw new Error(`Health check failed: ${response.status} ${response.statusText}`);
+      }
+
+      const healthData = await response.json();
+      
+      this.healthStatus = {
+        isHealthy: true,
+        lastChecked: new Date().toISOString(),
+        responseTime,
+        backend: {
+          status: healthData.status,
+          version: healthData.version,
+          timestamp: healthData.timestamp
+        },
+        services: {
+          api: 'healthy',
+          functions: 'healthy'
+        }
+      };
+
+      return this.healthStatus;
+
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      
+      this.healthStatus = {
+        isHealthy: false,
+        lastChecked: new Date().toISOString(),
+        responseTime,
+        error: error.message,
+        services: {
+          api: 'unhealthy',
+          functions: 'unknown'
+        }
+      };
+
+      return this.healthStatus;
+    }
+  }
+
+  /**
+   * Get cached health status
+   * @returns {object} Current health status
+   */
+  getHealthStatus() {
+    return this.healthStatus;
+  }
+
+  /**
+   * Check if services are healthy
+   * @returns {boolean} Overall health status
+   */
+  isHealthy() {
+    return this.healthStatus.isHealthy === true;
+  }
+
+  /**
+   * Get response time in ms
+   * @returns {number|null} Response time
+   */
+  getResponseTime() {
+    return this.healthStatus.responseTime;
+  }
+
+  /**
+   * Format response time for display
+   * @returns {string} Formatted response time
+   */
+  getFormattedResponseTime() {
+    const time = this.healthStatus.responseTime;
+    if (time === null) return 'Unknown';
+    
+    if (time < 1000) return `${time}ms`;
+    return `${(time / 1000).toFixed(2)}s`;
+  }
+
+  /**
+   * Get health status color for UI
+   * @returns {string} Color class
+   */
+  getStatusColor() {
+    if (this.healthStatus.isHealthy === null) return 'gray';
+    return this.healthStatus.isHealthy ? 'green' : 'red';
+  }
+
+  /**
+   * Get health status text
+   * @returns {string} Status text
+   */
+  getStatusText() {
+    if (this.healthStatus.isHealthy === null) return 'Unknown';
+    return this.healthStatus.isHealthy ? 'Healthy' : 'Unhealthy';
+  }
+}
 </file>
 
 <file path="src/utils/constants.js">

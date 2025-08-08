@@ -1,7 +1,7 @@
 // src/components/image/ResultsViewer.jsx
 
 import React from 'react';
-import { CheckCircle, Image } from 'lucide-react';
+import { CheckCircle, Image, BarChart3 } from 'lucide-react';
 import { Card } from '../ui/Card.jsx';
 import { ObjectDetection } from './ObjectDetection.jsx';
 import { FaceAnalysis } from './FaceAnalysis.jsx';
@@ -14,8 +14,9 @@ import { UI_CONSTANTS } from '../../utils/constants.js';
  * @param {object} props - Component props
  * @param {object} props.results - Analysis results
  * @param {File} props.uploadedImage - Original uploaded image file
+ * @param {function} [props.onViewAnalytics] - Analytics button click handler
  */
-export const ResultsViewer = ({ results, uploadedImage }) => {
+export const ResultsViewer = ({ results, uploadedImage, onViewAnalytics }) => {
   const { analysis } = results;
 
   return (
@@ -53,6 +54,22 @@ export const ResultsViewer = ({ results, uploadedImage }) => {
         />
         <TextDetection text={analysis.text} />
       </div>
+
+      {/* Analytics Button */}
+      {onViewAnalytics && (
+        <div className="text-center pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={onViewAnalytics}
+            className="inline-flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span>View System Analytics</span>
+          </button>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+            See how our AI performed and explore usage statistics
+          </p>
+        </div>
+      )}
     </div>
   );
 };

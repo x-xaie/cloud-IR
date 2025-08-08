@@ -5,6 +5,7 @@ import { PageSection } from './components/layout/PageSection.jsx';
 import { ImageUpload } from './components/image/ImageUpload.jsx';
 import { AnalyzeButton } from './components/image/AnalyzeButton.jsx';
 import { ResultsViewer } from './components/image/ResultsViewer.jsx';
+import { HealthDashboardModal } from './components/health/HealthDashboardModal.jsx';
 
 /**
  * Main application component with organized structure
@@ -13,6 +14,7 @@ const App = () => {
   const [imageId, setImageId] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [results, setResults] = useState(null);
+  const [isHealthDashboardOpen, setIsHealthDashboardOpen] = useState(false);
 
   const handleUploadSuccess = (id, file) => {
     setImageId(id);
@@ -30,11 +32,21 @@ const App = () => {
     setResults(null);
   };
 
+  const openHealthDashboard = () => {
+    setIsHealthDashboardOpen(true);
+  };
+
+  const closeHealthDashboard = () => {
+    setIsHealthDashboardOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header 
         onReset={resetApp}
         showResetButton={!!(imageId || results)}
+        showHealthStatus={true}
+        onHealthClick={openHealthDashboard}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
@@ -94,13 +106,23 @@ const App = () => {
                   Here's what our AI found in your image:
                 </p>
               </div>
-              <ResultsViewer results={results} uploadedImage={uploadedImage} />
+              <ResultsViewer 
+                results={results} 
+                uploadedImage={uploadedImage}
+                onViewAnalytics={openHealthDashboard}
+              />
             </div>
           )}
         </div>
       </main>
 
       <Footer />
+
+      {/* Health Dashboard Modal - Rendered at App level */}
+      <HealthDashboardModal 
+        isOpen={isHealthDashboardOpen}
+        onClose={closeHealthDashboard}
+      />
     </div>
   );
 };
